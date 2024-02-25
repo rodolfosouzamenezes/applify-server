@@ -3,27 +3,146 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        String @id @default(uuid())
-  githubId  Int    @unique
+  id        String  @id @default(uuid())
+  email     String  @unique
   name      String
-  login     String
-  avatarUrl String
+  avatarUrl String?
+  role      Role    @default(EMPLOYEE)
 
-  memories Memory[]
-}
-
-model Memory {
-  id        String   @id @default(uuid())
-  userId    String
-  coverUrl  String
-  content   String
-  isPublic  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  FixedProducts         FixedProducts[]
+  Cart                  Cart[]
+  Request               Request[]
+  ResquestStatusChanges ResquestStatusChanges[]
+  Movimentations        Movimentation[]
+}
+
+model Product {
+  id                String            @id @default(uuid())
+  label             String
+  coverUrl          String
+  isEPI             Boolean
+  unitOfMeasurement OnitOfMeasurement
+  unitPerPackage    Int?
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  ProductVariant ProductVariant[]
+  FixedProducts  FixedProducts[]
+}
+
+model ProductVariant {
+  id        String @id @default(uuid())
+  productId String
+  label     String
+  quantity  Int
+
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  product Product   @relation(fields: [productId], references: [id])
+  Cart    Cart[]
+  Request Request[]
+}
+
+model FixedProducts {
+  id        String @id @default(uuid())
+  productId String
+  userId    String
+
+  product Product @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
+
+model Cart {
+  id        String @id @default(uuid())
+  variantId String
+  userId    String
+  quantity  Int
+
+  variant ProductVariant @relation(fields: [variantId], references: [id])
+  user    User           @relation(fields: [userId], references: [id])
+}
+
+model Request {
+  id          String        @id @default(uuid())
+  code        String        @unique
+  variantId   String
+  userId      String
+  quantity    Int
+  status      RequestStatus @default(REQUESTED)
+  signatureId String?
+
+  variant               ProductVariant          @relation(fields: [variantId], references: [id])
+  user                  User                    @relation(fields: [userId], references: [id])
+  signature             Signature?              @relation(fields: [signatureId], references: [id])
+  ResquestStatusChanges ResquestStatusChanges[]
+  Movimentation         Movimentation[]
+}
+
+model Signature {
+  id           String @id @default(uuid())
+  signatureUrl String
+
+  Request Request[]
+}
+
+model ResquestStatusChanges {
+  id        String        @id @default(uuid())
+  variantId String
+  userId    String
+  status    RequestStatus
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  variant Request @relation(fields: [variantId], references: [id])
+}
+
+model Movimentation {
+  id        String            @id @default(uuid())
+  userId    String
+  variantId String
+  quantity  Int
+  type      MovimentationType
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id])
+  variant Request @relation(fields: [variantId], references: [id])
+}
+
+enum Role {
+  EMPLOYEE
+  APPROVER
+  ADMIN
+}
+
+enum OnitOfMeasurement {
+  UNIT
+  PAIR
+  PACKAGE
+}
+
+enum RequestStatus {
+  REQUESTED
+  DISAPPROVED
+  APPROVED
+  SEPARATED
+  INSUFFICIENT
+  CANCELED
+  COMPLETED
+}
+
+enum MovimentationType {
+  ADD
+  REMOVE
 }
