@@ -29,7 +29,7 @@ model Product {
   label             String
   coverUrl          String
   isEPI             Boolean
-  unitOfMeasurement OnitOfMeasurement
+  unitOfMeasurement UnitOfMeasurement
   unitPerPackage    Int?
 
   updatedAt DateTime @updatedAt
@@ -42,7 +42,7 @@ model Product {
 model ProductVariant {
   id        String @id @default(uuid())
   productId String
-  label     String
+  label     String @default("UNIQUE")
   quantity  Int
 
   updatedAt DateTime @updatedAt
@@ -60,6 +60,8 @@ model FixedProducts {
 
   product Product @relation(fields: [productId], references: [id])
   user    User    @relation(fields: [userId], references: [id])
+
+  @@map("fixed_products")
 }
 
 model Cart {
@@ -126,7 +128,7 @@ enum Role {
   ADMIN
 }
 
-enum OnitOfMeasurement {
+enum UnitOfMeasurement {
   UNIT
   PAIR
   PACKAGE

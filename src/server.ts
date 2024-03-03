@@ -5,7 +5,7 @@ import cors from '@fastify/cors'
 import jwt from '@fastify/jwt'
 import fastify from 'fastify'
 
-import { memoryRoutes } from './routes/memory';
+import { productRoutes } from './routes/product';
 import { uploadRoutes } from './routes/upload';
 import { authRoutes } from './routes/auth';
 import { resolve } from 'node:path';
@@ -31,7 +31,7 @@ app.register(require('@fastify/static'), {
 app.register(uploadRoutes)
 
 app.register(authRoutes)
-app.register(memoryRoutes)
+app.register(productRoutes)
 
 app
     .listen({

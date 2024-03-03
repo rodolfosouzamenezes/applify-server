@@ -1,0 +1,33 @@
+@baseUrl = http://localhost:3333
+
+###
+GET {{baseUrl}}/products
+
+###
+POST {{baseUrl}}/product
+content-type: application/json
+
+{
+  "label": "Luva Edge",
+  "coverUrl": "https://denunc.s3.sa-east-1.amazonaws.com/e066d565-b992-42c4-a564-06eb40575148-epi-3.png",
+  "isEPI": true,
+  "unitOfMeasurement": "UNIT",
+  "variants": [
+    {
+      "label": "P",
+      "quantity": 10
+    },
+    {
+      "label": "M",
+      "quantity": 13
+    },
+    {
+      "label": "G",
+      "quantity": 20
+    },
+    {
+      "label": "XG",
+      "quantity": 2
+    }
+  ]
+}
